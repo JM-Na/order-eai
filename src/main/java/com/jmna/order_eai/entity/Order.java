@@ -3,10 +3,12 @@ package com.jmna.order_eai.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Table(name = "ORDER_TB")
 @Entity
+@NoArgsConstructor
 public class Order {
 
     @EmbeddedId
