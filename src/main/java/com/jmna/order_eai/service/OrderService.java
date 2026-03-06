@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderSequenceRepository orderSequenceRepository;
+    private final ReceiptFileService receiptFileService;
 
     @Value("${inspien.applicant.key}")
     private String applicantKey;
@@ -67,7 +70,8 @@ public class OrderService {
         return headerItemMap;
     }
 
-    public void saveOrder(Map<HeaderXml, List<ItemXml>> headerItemMap) {
+    public void saveOrder(Map<HeaderXml, List<ItemXml>> headerItemMap) throws IOException {
+        List<Order> orderList = new ArrayList<>();
         for (HeaderXml headerXml : headerItemMap.keySet()) {
 
             List<ItemXml> itemXmlList = headerItemMap.get(headerXml);
@@ -89,9 +93,11 @@ public class OrderService {
                         .status(headerXml.getName())
                         .build();
 
-                System.out.println(order.getUserId() + ", " + order.getItemId() + ", " + order.getAddress());
-                orderRepository.save(order);
+                orderList.add(order);
             }
         }
+        orderRepository.saveAll(orderList);
+
+        receiptFileService.createReceipt(orderList);
     }
 }
