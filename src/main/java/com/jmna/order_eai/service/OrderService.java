@@ -91,7 +91,7 @@ public class OrderService {
                         .address(headerXml.getAddress())
                         .itemName(itemXml.getItemName())
                         .price(itemXml.getPrice())
-                        .status(headerXml.getName())
+                        .status(headerXml.getStatus().trim())
                         .build();
 
                 orderList.add(order);
@@ -101,6 +101,6 @@ public class OrderService {
 
         File receipt = receiptFileService.createReceipt(orderList);
 
-        ftpService.transferFile(receipt);
+//        ftpService.transferFile(receipt);
     }
 }

@@ -46,4 +46,8 @@ public class Order {
         this.price = price;
         this.status = status;
     }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
