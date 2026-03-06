@@ -26,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderSequenceRepository orderSequenceRepository;
     private final ReceiptFileService receiptFileService;
+    private final FtpService ftpService;
 
     @Value("${inspien.applicant.key}")
     private String applicantKey;
@@ -98,6 +99,8 @@ public class OrderService {
         }
         orderRepository.saveAll(orderList);
 
-        receiptFileService.createReceipt(orderList);
+        File receipt = receiptFileService.createReceipt(orderList);
+
+        ftpService.transferFile(receipt);
     }
 }
