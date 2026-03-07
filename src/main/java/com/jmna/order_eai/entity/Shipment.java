@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "SHIPMENT_TB")
+@Table(name = "SHIPMENT_TB", schema = "RECRUIT")
 @NoArgsConstructor
 public class Shipment {
     @EmbeddedId

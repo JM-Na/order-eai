@@ -19,10 +19,20 @@ public class OrderId implements Serializable {
     private String orderId;
 
     @Column
-    private String applicantId;
+    private String applicantKey;
 
-    public OrderId(String orderId, String applicantId) {
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    public OrderId(String orderId, String applicantKey) {
         this.orderId = orderId;
-        this.applicantId = applicantId;
+        this.applicantKey = applicantKey;
     }
 }

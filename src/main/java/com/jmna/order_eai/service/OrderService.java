@@ -8,6 +8,7 @@ import com.jmna.order_eai.repository.OrderSequenceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ public class OrderService {
     private final OrderSequenceRepository orderSequenceRepository;
     private final ReceiptFileService receiptFileService;
     private final FtpService ftpService;
+
+    private static int SEQUENCE = 0;
 
     @Value("${inspien.applicant.key}")
     private String applicantKey;
@@ -104,33 +107,39 @@ public class OrderService {
     @Transactional
     private List<Order> saveOrder(Map<HeaderXml, List<ItemXml>> headerItemMap) {
         List<Order> orderList = new ArrayList<>();
-        // HeaderXml 리스트 순회
-        for (HeaderXml headerXml : headerItemMap.keySet()) {
-            List<ItemXml> itemXmlList = headerItemMap.get(headerXml);
-            // 해당 HeaderXml을 키로 갖는 itemXml 값 순회
-            for (ItemXml itemXml : itemXmlList) {
-                // 시퀀스 값을 받아와서 orderId 생성
-                Long nextSequence = orderSequenceRepository.getNextSequence();
-                String orderId = OrderIdGenerator.generate(nextSequence);
-                // Order 생성
-                Order order = Order.builder()
-                        .orderId(orderId)
-                        .applicantKey(applicantKey)
-                        .userId(headerXml.getUserId())
-                        .itemId(itemXml.getItemId())
-                        .name(headerXml.getName())
-                        .address(headerXml.getAddress())
-                        .itemName(itemXml.getItemName())
-                        .price(itemXml.getPrice())
-                        .status(headerXml.getStatus().trim())
-                        .build();
+        try {
+            // HeaderXml 리스트 순회
+            for (HeaderXml headerXml : headerItemMap.keySet()) {
+                List<ItemXml> itemXmlList = headerItemMap.get(headerXml);
+                // 해당 HeaderXml을 키로 갖는 itemXml 값 순회
+                for (ItemXml itemXml : itemXmlList) {
+                    // 시퀀스 값을 받아와서 orderId 생성
+//                Long nextSequence = orderSequenceRepository.getNextSequence();
+                    String orderId = OrderIdGenerator.generate(SEQUENCE);
+                    // Order 생성
+                    Order order = Order.builder()
+                            .orderId(orderId)
+                            .applicantKey(applicantKey)
+                            .userId(headerXml.getUserId())
+                            .itemId(itemXml.getItemId())
+                            .name(headerXml.getName())
+                            .address(headerXml.getAddress())
+                            .itemName(itemXml.getItemName())
+                            .price(itemXml.getPrice())
+                            .status(headerXml.getStatus().trim())
+                            .build();
 
-                orderList.add(order);
+                    orderList.add(order);
+                    SEQUENCE++;
+                }
             }
+            // Order 리스트 전체 저장
+            orderRepository.saveAll(orderList);
+            log.info("주문 정보 저장 성공");
+        } catch (DataAccessException e) {
+            log.error("DB 저장 중 오류 발생", e);
+            throw e; // 트랜잭션 rollback
         }
-        // Order 리스트 전체 저장
-        orderRepository.saveAll(orderList);
-        log.info("주문 정보 저장 성공");
 
         return orderList;
     }

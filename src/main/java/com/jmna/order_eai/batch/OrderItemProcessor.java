@@ -18,8 +18,9 @@ public class OrderItemProcessor implements ItemProcessor<Order, Shipment> {
 
     @Override
     public Shipment process(Order order) throws Exception {
+        String shipmentId = order.getId().getOrderId().replace("A", "S00");
         return Shipment.builder()
-                .shipmentId(String.valueOf(UUID.randomUUID()))
+                .shipmentId(shipmentId)
                 .applicantId(applicantKey)
                 .orderId(order.getId().getOrderId())
                 .itemId(order.getItemId())

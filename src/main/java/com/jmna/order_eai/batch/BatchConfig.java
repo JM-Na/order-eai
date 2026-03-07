@@ -13,7 +13,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaCursorItemReader;
-import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -24,30 +23,26 @@ public class BatchConfig {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
+    private final EntityManagerFactory emf;
 
-    private final int PAGE_SIZE = 10;
     private final int CHUNK_SIZE = 10;
 
-    // DB에서 status = 'N'을 조회하는 reader
     @Bean
-    public JpaCursorItemReader<Order> orderReader(EntityManagerFactory emf) {
+    public JpaCursorItemReader<Order> orderReader() {
+
         JpaCursorItemReader<Order> reader = new JpaCursorItemReader<>();
 
         reader.setName("orderReader");
         reader.setEntityManagerFactory(emf);
-
         reader.setQueryString("SELECT o FROM Order o WHERE o.status = 'N'");
 
         return reader;
     }
 
     @Bean
-    public Step orderToShipmentStep(JobRepository jobRepository,
-                                    PlatformTransactionManager transactionManager,
-                                    ItemReader<Order> reader,
-                                    ItemProcessor<Order, Shipment> processor,
-                                    ItemWriter<Shipment> writer) {
-        return new StepBuilder("orderToShipmentStep", jobRepository)
+    public Step orderStep(ItemReader<Order> reader, ItemProcessor<Order, Shipment> processor, ItemWriter<Shipment> writer) {
+
+        return new StepBuilder("orderStep", jobRepository)
                 .<Order, Shipment>chunk(CHUNK_SIZE, transactionManager)
                 .reader(reader)
                 .processor(processor)
@@ -56,10 +51,10 @@ public class BatchConfig {
     }
 
     @Bean
-    public Job orderToShipmentJob(JobRepository jobRepository,
-                                  Step orderToShipmentStep){
-        return new JobBuilder("orderToShipmentJob", jobRepository)
-                .start(orderToShipmentStep)
+    public Job orderJob(Step orderStep) {
+
+        return new JobBuilder("orderJob", jobRepository)
+                .start(orderStep)
                 .build();
     }
 }

@@ -24,7 +24,7 @@ public class ReceiptFileService {
                 String orderInfo = order.getId().getOrderId() + "^" +
                         order.getUserId() + "^" +
                         order.getItemId() + "^" +
-                        order.getId().getApplicantId() + "^" +
+                        order.getId().getApplicantKey() + "^" +
                         order.getName() + "^" +
                         order.getAddress() + "^" +
                         order.getItemName() + "^" +

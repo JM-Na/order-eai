@@ -18,10 +18,20 @@ public class ShipmentId implements Serializable {
     private String shipmentId;
 
     @Column
-    private String applicantId;
+    private String applicantKey;
 
-    public ShipmentId(String shipmentId, String applicantId) {
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    public ShipmentId(String shipmentId, String applicantKey) {
         this.shipmentId = shipmentId;
-        this.applicantId = applicantId;
+        this.applicantKey = applicantKey;
     }
 }

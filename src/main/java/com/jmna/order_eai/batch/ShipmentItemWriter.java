@@ -1,6 +1,5 @@
 package com.jmna.order_eai.batch;
 
-import com.jmna.order_eai.entity.Order;
 import com.jmna.order_eai.entity.OrderId;
 import com.jmna.order_eai.entity.Shipment;
 import com.jmna.order_eai.repository.OrderRepository;
@@ -30,7 +29,7 @@ public class ShipmentItemWriter implements ItemWriter<Shipment> {
         List<OrderId> orderIdList = chunk.getItems()
                 .stream()
                 .map(s ->
-                        new OrderId(s.getOrderId(),s.getId().getApplicantId()))
+                        new OrderId(s.getOrderId(),s.getId().getApplicantKey()))
                 .toList();
 
         orderRepository.updateStatus(orderIdList);

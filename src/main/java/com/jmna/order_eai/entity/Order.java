@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
-@Table(name = "ORDER_TB")
+@Table(name = "ORDER_TB", schema = "RECRUIT")
 @Entity
 @NoArgsConstructor
 public class Order {
