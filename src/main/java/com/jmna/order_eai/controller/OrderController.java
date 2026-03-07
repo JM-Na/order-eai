@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @Slf4j
 @RequestMapping(value = "/api")
 @RestController
@@ -19,7 +17,7 @@ public class OrderController {
 
     @ResponseBody
     @PostMapping(value = "/receive", consumes = MediaType.APPLICATION_XML_VALUE)
-    public SyncResult receive(@RequestBody RequestXml request) throws IOException {
+    public SyncResult receive(@RequestBody RequestXml request) {
         
         log.info("주문 정보 요청 발생");
 

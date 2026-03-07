@@ -5,6 +5,9 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 주문 정보 검증 결과를 담을 DTO
+ */
 @Data
 public class ValidateResult {
     private Map<HeaderXml, List<ItemXml>> headerItemMap;

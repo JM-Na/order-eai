@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * 복합키 orderId, applicantId를 위한 클래스
+ */
 @Getter
 @NoArgsConstructor
 @Embeddable

@@ -3,6 +3,9 @@ package com.jmna.order_eai.dto;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
 
+/**
+ * 주문 정보 XML중 Header 값만을 담을 클래스
+ */
 @Data
 public class HeaderXml {
 

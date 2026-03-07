@@ -28,13 +28,15 @@ public class FtpService {
     private String ftpFilePath;
 
     public void transferFile(File file) throws IOException {
+        // FTP 클라이언트 생성 및 연결
         FTPClient ftpClient = new FTPClient();
-
+        
         ftpClient.setControlEncoding("UTF-8");
         ftpClient.connect(ftpHost, ftpPort);
-
+        
         int reply = ftpClient.getReplyCode();
 
+        // FTP 연결 성공 여부 확인
         if (!FTPReply.isPositiveCompletion(reply)) {
             ftpClient.disconnect();
             log.error("FTP 서버 연결 거부: {}", reply);
@@ -42,6 +44,7 @@ public class FtpService {
         }
         log.info("FTP 연결 성공");
 
+        // FTP 로그인
         if (!ftpClient.login(ftpUser, ftpPassword)) {
             log.error("FTP 로그인 실패: {}", ftpClient.getReplyString());
             throw new IOException("FTP 로그인 실패 : " + ftpClient.getReplyString());
@@ -52,8 +55,9 @@ public class FtpService {
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
         try (InputStream input = new FileInputStream(file)) {
-
+            // 대상 디렉토리로 변경
             ftpClient.changeWorkingDirectory(ftpFilePath);
+            // 파일 저장
             boolean result = ftpClient.storeFile(file.getName(), input);
             if (!result) {
                 log.error("FTP 파일 전송 실패 : {}", ftpClient.getReplyString());

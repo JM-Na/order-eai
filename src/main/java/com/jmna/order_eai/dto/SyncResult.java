@@ -5,6 +5,9 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 주문 정보 요청 Sync에 대한 응답 클래스
+ */
 @Data
 public class SyncResult {
 

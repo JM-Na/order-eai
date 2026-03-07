@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Request에 Id 부여 필터
+ */
 @Component
 public class RequestLoggingFilter implements Filter {
     @Override

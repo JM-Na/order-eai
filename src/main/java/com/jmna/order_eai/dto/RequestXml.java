@@ -8,6 +8,9 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Request Xml을 담을 클래스
+ */
 @Getter
 @JacksonXmlRootElement(localName = "Request")
 public class RequestXml {

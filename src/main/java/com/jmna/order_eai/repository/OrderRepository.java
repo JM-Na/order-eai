@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, OrderId> {
-
+    // OrderId 리스트에 해당하는 Order를 대상으로 Status 업데이트
     @Modifying
     @Query("""
             UPDATE Order o

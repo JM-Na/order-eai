@@ -33,17 +33,21 @@ public class OrderService {
     private String applicantKey;
 
     public SyncResult processOrder(RequestXml request) {
+        // 데이터 검증 결과
         ValidateResult validateResult = validate(request);
 
         Integer successCount = validateResult.getSuccessCount();
         Integer failCount = validateResult.getFailCount();
         List<ErrorDetail> errors = validateResult.getErrors();
-
         Map<HeaderXml, List<ItemXml>> headerItemMap = validateResult.getHeaderItemMap();
-
+        
+        // 데이터 Order의 형태로 저장
         List<Order> orders = saveOrder(headerItemMap);
+
+        // 데이터 영수증 파일로 저장 및 FTP 전송
         Boolean ftp = sendOrderFtp(orders);
 
+        // FTP 성공 여부 확인
         if (!ftp) {
             return new SyncResult("Fail", new ErrorDetail(null, null, "FTP 전송 오류"));
         }
@@ -100,15 +104,15 @@ public class OrderService {
     @Transactional
     private List<Order> saveOrder(Map<HeaderXml, List<ItemXml>> headerItemMap) {
         List<Order> orderList = new ArrayList<>();
+        // HeaderXml 리스트 순회
         for (HeaderXml headerXml : headerItemMap.keySet()) {
-
             List<ItemXml> itemXmlList = headerItemMap.get(headerXml);
-
+            // 해당 HeaderXml을 키로 갖는 itemXml 값 순회
             for (ItemXml itemXml : itemXmlList) {
-                long nextSequence = orderSequenceRepository.getNextSequence();
-
+                // 시퀀스 값을 받아와서 orderId 생성
+                Long nextSequence = orderSequenceRepository.getNextSequence();
                 String orderId = OrderIdGenerator.generate(nextSequence);
-
+                // Order 생성
                 Order order = Order.builder()
                         .orderId(orderId)
                         .applicantKey(applicantKey)
@@ -124,6 +128,7 @@ public class OrderService {
                 orderList.add(order);
             }
         }
+        // Order 리스트 전체 저장
         orderRepository.saveAll(orderList);
         log.info("주문 정보 저장 성공");
 
@@ -133,16 +138,16 @@ public class OrderService {
 
     private Boolean sendOrderFtp(List<Order> orderList) {
         try {
+            // 영수증 파일 생성
             File receipt = receiptFileService.createReceipt(orderList);
             log.info("주문 정보 기반 영수증 생성 성공");
-
+            // 영수증 FTP 전송
             ftpService.transferFile(receipt);
             log.info("영수증 FTP 전송 성공");
         } catch (IOException e) {
             log.error("주문 처리 중 오류", e);
             return false;
         }
-
         return true;
     }
 }
