@@ -5,7 +5,7 @@
 
     <!-- 로그 패턴 -->
     <property name="LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n"/>
+              value=">%d{yyyy-MM-dd HH:mm:ss} [%thread] [%X{requestId}] %-5level %logger - %msg%n"/>
 
     <!-- 일반 로그 파일 -->
     <appender name="FILE"

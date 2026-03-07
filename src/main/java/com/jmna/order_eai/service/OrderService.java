@@ -32,7 +32,26 @@ public class OrderService {
     @Value("${inspien.applicant.key}")
     private String applicantKey;
 
-    public ValidateResult validate(RequestXml requestXml) {
+    public SyncResult processOrder(RequestXml request) {
+        ValidateResult validateResult = validate(request);
+
+        Integer successCount = validateResult.getSuccessCount();
+        Integer failCount = validateResult.getFailCount();
+        List<ErrorDetail> errors = validateResult.getErrors();
+
+        Map<HeaderXml, List<ItemXml>> headerItemMap = validateResult.getHeaderItemMap();
+
+        List<Order> orders = saveOrder(headerItemMap);
+        Boolean ftp = sendOrderFtp(orders);
+
+        if (!ftp) {
+            return new SyncResult("Fail", new ErrorDetail(null, null, "FTP 전송 오류"));
+        }
+
+        return new SyncResult(successCount, failCount, errors);
+    }
+
+    private ValidateResult validate(RequestXml requestXml) {
         // Header 맵, key: USER_ID, value: HeaderXml
         Map<String, HeaderXml> headerMap = requestXml.getHeaders().stream()
                 .collect(Collectors.toMap(
@@ -56,7 +75,7 @@ public class OrderService {
             if (!headerMap.containsKey(userId)) {
                 log.error("존재하지 않는 userId = {}를 참조하는 아이템 itemId = {}", userId, item.getItemId());
                 failCount++;
-                errors.add(new ErrorDetail(null, item.getItemId(), "존재하지 않는 userId = " + userId +"를 참조하는 아이템 itemId = " + item.getItemId()));
+                errors.add(new ErrorDetail(null, item.getItemId(), "존재하지 않는 userId = " + userId + "를 참조하는 아이템 itemId = " + item.getItemId()));
             } else {
                 // Header Item 맵에 해당하는 값 추가
                 headerItemMap
@@ -79,7 +98,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void saveOrder(Map<HeaderXml, List<ItemXml>> headerItemMap) {
+    private List<Order> saveOrder(Map<HeaderXml, List<ItemXml>> headerItemMap) {
         List<Order> orderList = new ArrayList<>();
         for (HeaderXml headerXml : headerItemMap.keySet()) {
 
@@ -105,19 +124,25 @@ public class OrderService {
                 orderList.add(order);
             }
         }
+        orderRepository.saveAll(orderList);
+        log.info("주문 정보 저장 성공");
 
+        return orderList;
+    }
+
+
+    private Boolean sendOrderFtp(List<Order> orderList) {
         try {
-            orderRepository.saveAll(orderList);
-            log.info("주문 정보 저장 성공");
-
             File receipt = receiptFileService.createReceipt(orderList);
             log.info("주문 정보 기반 영수증 생성 성공");
 
-//            ftpService.transferFile(receipt);
-//            log.info("영수증 FTP 전송 성공");
+            ftpService.transferFile(receipt);
+            log.info("영수증 FTP 전송 성공");
         } catch (IOException e) {
-
+            log.error("주문 처리 중 오류", e);
+            return false;
         }
 
+        return true;
     }
 }
