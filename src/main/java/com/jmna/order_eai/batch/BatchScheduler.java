@@ -20,7 +20,7 @@ public class BatchScheduler {
     // 5분 간격으로 실행
     @Scheduled(cron = "0 0/5 * * * *")
     public void runJob() throws Exception {
-        log.info("예정된 스케줄러 실행");
+        log.info("5분 단위 스케줄러 실행: 운송 DB로 주문 정보 전달");
         
         // JobParameter가 겹치지 않도록 함.
         JobParameters parameters = new JobParametersBuilder()
