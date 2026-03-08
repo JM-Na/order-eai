@@ -16,7 +16,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @ResponseBody
-    @PostMapping(value = "/receive", consumes = MediaType.APPLICATION_XML_VALUE)
+    @PostMapping(value = "/order", consumes = MediaType.APPLICATION_XML_VALUE)
     public SyncResult receive(@RequestBody RequestXml request) {
         
         log.info("주문 정보 요청 발생");
