@@ -1,4 +1,4 @@
-package com.jmna.order_eai.batch;
+package com.jmna.order_eai.config;
 
 import com.jmna.order_eai.entity.Order;
 import com.jmna.order_eai.entity.Shipment;

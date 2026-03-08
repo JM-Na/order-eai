@@ -5,9 +5,11 @@ import com.jmna.order_eai.entity.OrderId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, OrderId> {
@@ -18,5 +20,8 @@ public interface OrderRepository extends JpaRepository<Order, OrderId> {
             SET o.status = 'Y'
             WHERE o.id IN :orderIdList
             """)
-    void updateStatus(List<OrderId> orderIdList);
+    void updateStatus(@Param("orderIdList") List<OrderId> orderIdList);
+
+    @Query("SELECT MAX(o.id.orderId) FROM Order o WHERE o.id.applicantKey = :applicantKey")
+    Optional<String> findMaxOrderId(@Param("applicantKey") String applicantKey);
 }

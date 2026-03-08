@@ -5,6 +5,7 @@ import com.jmna.order_eai.entity.Order;
 import com.jmna.order_eai.entity.OrderIdGenerator;
 import com.jmna.order_eai.repository.OrderRepository;
 import com.jmna.order_eai.repository.OrderSequenceRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,10 +32,25 @@ public class OrderService {
     private final ReceiptFileService receiptFileService;
     private final FtpService ftpService;
 
-    private static int SEQUENCE = 0;
+    private static final AtomicInteger SEQUENCE = new AtomicInteger(0);
 
     @Value("${inspien.applicant.key}")
     private String applicantKey;
+
+    @PostConstruct
+    public void initSequence() {
+        // DB 상 OrderId의 최대값을 읽어옴.
+        orderRepository.findMaxOrderId(applicantKey).ifPresent(maxId -> {
+            char alphabet = maxId.charAt(0);
+            String num = maxId.substring(1);
+            // 최대값의 알파벳, 숫자 부분을 고려하여서 마지막 시퀀스 값을 알아냄.
+            int alphaOffset = (alphabet - 'A') * 1000;
+            int currentValue = alphaOffset + Integer.parseInt(num) + 1;
+            // 시퀀스 초기화
+            SEQUENCE.set(currentValue);
+            log.info("SEQUENCE 초기화: {}", SEQUENCE.get());
+        });
+    }
 
     public SyncResult processOrder(RequestXml request) {
         // 데이터 검증 결과
@@ -115,7 +132,7 @@ public class OrderService {
                 for (ItemXml itemXml : itemXmlList) {
                     // 시퀀스 값을 받아와서 orderId 생성
 //                Long nextSequence = orderSequenceRepository.getNextSequence();
-                    String orderId = OrderIdGenerator.generate(SEQUENCE);
+                    String orderId = OrderIdGenerator.generate(SEQUENCE.getAndIncrement());
                     // Order 생성
                     Order order = Order.builder()
                             .orderId(orderId)
@@ -130,7 +147,6 @@ public class OrderService {
                             .build();
 
                     orderList.add(order);
-                    SEQUENCE++;
                 }
             }
             // Order 리스트 전체 저장

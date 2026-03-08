@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Getter
-@Table(name = "ORDER_TB", schema = "RECRUIT")
+@Table(name = "ORDER_TB"
+//        , schema = "RECRUIT"
+)
 @Entity
 @NoArgsConstructor
 public class Order {
