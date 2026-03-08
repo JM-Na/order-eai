@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "SHIPMENT_TB"
-//        , schema = "RECRUIT"
+        , schema = "RECRUIT"
 )
 @NoArgsConstructor
 public class Shipment {
