@@ -7,8 +7,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Slf4j
 @Component
 public class OrderItemProcessor implements ItemProcessor<Order, Shipment> {
@@ -17,8 +15,8 @@ public class OrderItemProcessor implements ItemProcessor<Order, Shipment> {
     private String applicantKey;
 
     @Override
-    public Shipment process(Order order) throws Exception {
-        String shipmentId = order.getId().getOrderId().replace("A", "S00");
+    public Shipment process(Order order) {
+        String shipmentId = "S00" + order.getId().getOrderId().substring(1);
         return Shipment.builder()
                 .shipmentId(shipmentId)
                 .applicantId(applicantKey)
