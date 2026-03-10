@@ -2,6 +2,7 @@ package com.jmna.order_eai.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @Embeddable
+@EqualsAndHashCode
 public class OrderId implements Serializable {
     // 형식: 알파벳 1개 + 숫자 3개 (ex: A113)
     @Column
@@ -20,16 +22,6 @@ public class OrderId implements Serializable {
 
     @Column
     private String applicantKey;
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
 
     public OrderId(String orderId, String applicantKey) {
         this.orderId = orderId;

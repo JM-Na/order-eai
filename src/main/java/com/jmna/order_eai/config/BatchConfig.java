@@ -34,7 +34,7 @@ public class BatchConfig {
 
         reader.setName("orderReader");
         reader.setEntityManagerFactory(emf);
-        reader.setQueryString("SELECT o FROM Order o WHERE o.status = 'N'");
+        reader.setQueryString("SELECT o FROM Order o WHERE o.status = 'N' AND o.id.applicantKey = 'NJM000021'");
 
         return reader;
     }
